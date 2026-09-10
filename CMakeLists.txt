@@ -12,8 +12,8 @@ endif()
 # Project start
 project(VitaShell)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
-set(VITA_APP_NAME "VitaShell")
-set(VITA_TITLEID  "VITASHELL")
+set(VITA_APP_NAME "EnsoShell")
+set(VITA_TITLEID  "ENSOSHELL")
 set(VITA_VERSION  "02.05")
 
 # Flags and includes
