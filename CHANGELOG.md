@@ -1,4 +1,7 @@
 # Changelog
+### Changelog 2.06
+- Added patches for Vita3K.
+- Changed name also with new livearea images.
 
 ### Changelog 2.05
 - Use this fork repo to check for a newer versions.
