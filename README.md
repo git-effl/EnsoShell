@@ -90,7 +90,7 @@ Install [Vita SDK](https://github.com/vitasdk) and build EnsoShell using:
 ```
 git clone https://github.com/git-effl/EnsoShell
 cd EnsoShell/
-mkdir build && cd build && cmake .. && cd modules/kernel && make && cd ../patch && make && cd ../usbdevice && make && cd ../user && make && cd ../.. && make
+mkdir build && cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=${VITASDK}/share/vita.toolchain.cmake cmake .. -DCMAKE_TOOLCHAIN_FILE=${VITASDK}/share/vita.toolchain.cmake && cd modules/kernel && make && cd ../patch && make && cd ../usbdevice && make && cd ../user && make && cd ../.. && make
 ```
 >[!WARNING]
 >If you ever get an error like "examplepackage.h: Not such file or directory" install the package related to the .c or .h file with vdpm
