@@ -60,7 +60,7 @@ static int qr_scanned = 0;
 
 static SceUID thid;
 
-int qr_thread() {
+int qr_thread(SceSize args, void *argp) {
   qr = quirc_new();
   quirc_resize(qr, CAM_WIDTH, CAM_HEIGHT);
   qr_next = 1;

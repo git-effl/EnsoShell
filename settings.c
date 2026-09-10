@@ -337,7 +337,7 @@ void settingsMenuCtrl() {
         
       case SETTINGS_OPTION_TYPE_CALLBACK:
         if (option->callback)
-          option->callback(&option);
+          option->callback();
         break;
         
       case SETTINGS_OPTION_TYPE_OPTIONS:

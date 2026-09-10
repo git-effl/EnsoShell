@@ -94,8 +94,8 @@ int shellKernelIsUx0Redirected(const char *blkdev, const char *blkdev2) {
     return 0;
   }
 
-  ksceKernelStrncpyUserToKernel(k_blkdev, (uintptr_t)blkdev, sizeof(k_blkdev)-1);
-  ksceKernelStrncpyUserToKernel(k_blkdev2, (uintptr_t)blkdev2, sizeof(k_blkdev2)-1);
+  ksceKernelStrncpyUserToKernel(k_blkdev, (const char *)blkdev, sizeof(k_blkdev)-1);
+  ksceKernelStrncpyUserToKernel(k_blkdev2, (const char *)blkdev2, sizeof(k_blkdev2)-1);
 
   if (mount && mount->dev && mount->dev->blkdev && strcmp(mount->dev->blkdev, k_blkdev) == 0) {
     EXIT_SYSCALL(state);
@@ -116,8 +116,8 @@ int shellKernelRedirectUx0(const char *blkdev, const char *blkdev2) {
     return -1;
   }
 
-  ksceKernelStrncpyUserToKernel(ux0_blkdev, (uintptr_t)blkdev, sizeof(ux0_blkdev)-1);
-  ksceKernelStrncpyUserToKernel(ux0_blkdev2, (uintptr_t)blkdev2, sizeof(ux0_blkdev2)-1);
+  ksceKernelStrncpyUserToKernel(ux0_blkdev, (const char *)blkdev, sizeof(ux0_blkdev)-1);
+  ksceKernelStrncpyUserToKernel(ux0_blkdev2, (const char *)blkdev2, sizeof(ux0_blkdev2)-1);
 
   mount->dev = &ux0_dev;
   mount->dev2 = &ux0_dev;
@@ -208,13 +208,13 @@ int _shellKernelMountById(ShellMountIdArgs *args) {
   memset(mount_point, 0, sizeof(mount_point));
 
   if (args->process_titleid)
-    ksceKernelStrncpyUserToKernel(process_titleid, (uintptr_t)args->process_titleid, 11);
+    ksceKernelStrncpyUserToKernel(process_titleid, (const char *)args->process_titleid, 11);
   if (args->path)
-    ksceKernelStrncpyUserToKernel(path, (uintptr_t)args->path, 255);
+    ksceKernelStrncpyUserToKernel(path, (const char *)args->path, 255);
   if (args->desired_mount_point)
-    ksceKernelStrncpyUserToKernel(desired_mount_point, (uintptr_t)args->desired_mount_point, 15);
+    ksceKernelStrncpyUserToKernel(desired_mount_point, (const char *)args->desired_mount_point, 15);
   if (args->klicensee)
-    ksceKernelMemcpyUserToKernel(klicensee, (uintptr_t)args->klicensee, 0x10);
+    ksceKernelMemcpyUserToKernel(klicensee, (const void *)args->klicensee, 0x10);
 
   res = sceAppMgrMountById(process_id,
                            info + 0x580,
@@ -226,7 +226,7 @@ int _shellKernelMountById(ShellMountIdArgs *args) {
                            mount_point);
 
   if (args->mount_point)
-    ksceKernelStrncpyKernelToUser((uintptr_t)args->mount_point, mount_point, 15);
+    ksceKernelStrncpyKernelToUser((char *)args->mount_point, mount_point, 15);
 
   return res;
 }
@@ -236,7 +236,7 @@ int shellKernelMountById(ShellMountIdArgs *args) {
   ENTER_SYSCALL(state);
 
   ShellMountIdArgs k_args;
-  ksceKernelMemcpyUserToKernel(&k_args, (uintptr_t)args, sizeof(ShellMountIdArgs));
+  ksceKernelMemcpyUserToKernel(&k_args, (const void *)args, sizeof(ShellMountIdArgs));
 
   int res = ksceKernelRunWithStack(0x2000, (void *)_shellKernelMountById, &k_args);
 
@@ -251,17 +251,17 @@ int shellKernelGetRifVitaKey(const void *license_buf, void *klicensee) {
   memset(k_klicensee, 0, sizeof(k_klicensee));
 
   if (license_buf)
-    ksceKernelMemcpyUserToKernel(k_license_buf, (uintptr_t)license_buf, sizeof(k_license_buf));
+    ksceKernelMemcpyUserToKernel(k_license_buf, (const void *)license_buf, sizeof(k_license_buf));
 
   int res = ksceNpDrmGetRifVitaKey(k_license_buf, (uint8_t *)k_klicensee, NULL, NULL, NULL, NULL);
 
   if (klicensee)
-    ksceKernelMemcpyKernelToUser((uintptr_t)klicensee, k_klicensee, sizeof(k_klicensee));
+    ksceKernelMemcpyKernelToUser((void *)klicensee, k_klicensee, sizeof(k_klicensee));
 
   return res;
 }
 
-void _start() __attribute__ ((weak, alias("module_start")));
+int _start(SceSize args, void *argp) __attribute__ ((weak, alias("module_start")));
 int module_start(SceSize args, void *argp) {
   SceUID tmp1, tmp2;
   // Get tai module info

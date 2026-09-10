@@ -52,34 +52,6 @@ INCLUDE_EXTERN_RESOURCE(default_text_icon_png);
 INCLUDE_EXTERN_RESOURCE(default_file_symlink_icon_png);
 INCLUDE_EXTERN_RESOURCE(default_folder_symlink_icon_png);
 
-INCLUDE_EXTERN_RESOURCE(electron_colors_txt);
-INCLUDE_EXTERN_RESOURCE(electron_archive_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_audio_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_battery_bar_charge_png);
-INCLUDE_EXTERN_RESOURCE(electron_battery_bar_green_png);
-INCLUDE_EXTERN_RESOURCE(electron_battery_bar_red_png);
-INCLUDE_EXTERN_RESOURCE(electron_battery_png);
-INCLUDE_EXTERN_RESOURCE(electron_bg_audioplayer_png);
-INCLUDE_EXTERN_RESOURCE(electron_bg_browser_png);
-INCLUDE_EXTERN_RESOURCE(electron_bg_hexeditor_png);
-INCLUDE_EXTERN_RESOURCE(electron_bg_photoviewer_png);
-INCLUDE_EXTERN_RESOURCE(electron_bg_texteditor_png);
-INCLUDE_EXTERN_RESOURCE(electron_context_png);
-INCLUDE_EXTERN_RESOURCE(electron_context_more_png);
-INCLUDE_EXTERN_RESOURCE(electron_cover_png);
-INCLUDE_EXTERN_RESOURCE(electron_dialog_png);
-INCLUDE_EXTERN_RESOURCE(electron_fastforward_png);
-INCLUDE_EXTERN_RESOURCE(electron_fastrewind_png);
-INCLUDE_EXTERN_RESOURCE(electron_file_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_folder_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_ftp_png);
-INCLUDE_EXTERN_RESOURCE(electron_image_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_pause_png);
-INCLUDE_EXTERN_RESOURCE(electron_play_png);
-INCLUDE_EXTERN_RESOURCE(electron_sfo_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_text_icon_png);
-INCLUDE_EXTERN_RESOURCE(electron_settings_png);
-
 INCLUDE_EXTERN_RESOURCE(umass_skprx);
 
 extern unsigned char _binary_modules_kernel_kernel_skprx_start;
@@ -119,34 +91,6 @@ static DefaultFile default_files[] = {
   DEFAULT_FILE("ux0:VitaShell/theme/Default/sfo_icon.png", default_sfo_icon_png, 1),
   DEFAULT_FILE("ux0:VitaShell/theme/Default/text_icon.png", default_text_icon_png, 1),
 
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/colors.txt", electron_colors_txt, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/archive_icon.png", electron_archive_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/audio_icon.png", electron_audio_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/battery.png", electron_battery_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/battery_bar_charge.png", electron_battery_bar_charge_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/battery_bar_green.png", electron_battery_bar_green_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/battery_bar_red.png", electron_battery_bar_red_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/bg_audioplayer.png", electron_bg_audioplayer_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/bg_browser.png", electron_bg_browser_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/bg_hexeditor.png", electron_bg_hexeditor_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/bg_photoviewer.png", electron_bg_photoviewer_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/bg_texteditor.png", electron_bg_texteditor_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/context.png", electron_context_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/context_more.png", electron_context_more_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/cover.png", electron_cover_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/dialog.png", electron_dialog_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/fastforward.png", electron_fastforward_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/fastrewind.png", electron_fastrewind_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/file_icon.png", electron_file_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/folder_icon.png", electron_folder_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/ftp.png", electron_ftp_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/image_icon.png", electron_image_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/pause.png", electron_pause_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/play.png", electron_play_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/sfo_icon.png", electron_sfo_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/text_icon.png", electron_text_icon_png, 1),
-  DEFAULT_FILE("ux0:VitaShell/theme/Electron/settings.png", electron_settings_png, 1),
-
   DEFAULT_FILE("ux0:VitaShell/module/umass.skprx", umass_skprx, 1),
   
   { "ux0:VitaShell/module/kernel.skprx",    (void *)&_binary_modules_kernel_kernel_skprx_start,
@@ -180,9 +124,9 @@ static void initSceAppUtil() {
   memset(&boot_param, 0, sizeof(SceAppUtilBootParam));
   sceAppUtilInit(&init_param, &boot_param);
 
-  // Mount
-  sceAppUtilMusicMount();
-  sceAppUtilPhotoMount();
+  // VITA3K FIX: Skipped music/photo mounts to avoid unhandled system calls
+  // sceAppUtilMusicMount();
+  // sceAppUtilPhotoMount();
 
   // System params
   sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, &language);
@@ -210,20 +154,9 @@ static void finishSceAppUtil() {
 static int isKoreanChar(unsigned int c) {
   unsigned short ch = c;
 
-  // Hangul compatibility jamo block
-  if (0x3130 <= ch && ch <= 0x318F) {
-    return 1;
-  }
-
-  // Hangul syllables block
-  if (0xAC00 <= ch && ch <= 0xD7AF) {
-    return 1;
-  }
-
-  // Korean won sign
-  if (ch == 0xFFE6) {
-    return 1;
-  }
+  if (0x3130 <= ch && ch <= 0x318F) return 1;
+  if (0xAC00 <= ch && ch <= 0xD7AF) return 1;
+  if (ch == 0xFFE6) return 1;
 
   return 0;
 }
@@ -231,15 +164,8 @@ static int isKoreanChar(unsigned int c) {
 static int isLatinChar(unsigned int c) {
   unsigned short ch = c;
 
-  // Basic latin block + latin-1 supplement block
-  if (ch <= 0x00FF) {
-    return 1;
-  }
-
-  // Cyrillic block
-  if (0x0400 <= ch && ch <= 0x04FF) {
-    return 1;
-  }
+  if (ch <= 0x00FF) return 1;
+  if (0x0400 <= ch && ch <= 0x04FF) return 1;
 
   return 0;
 }
@@ -333,31 +259,28 @@ void installDefaultFiles() {
 }
 
 void initVitaShell() {
-  // Set CPU to 444mhz
+  // Set CPU frequency
   scePowerSetArmClockFrequency(444);
 
-  // Init SceShellUtil events
-  sceShellUtilInitEvents(0);
-
-  // Prevent automatic CMA connection
-  sceShellUtilLock(SCE_SHELL_UTIL_LOCK_TYPE_USB_CONNECTION);
+  // VITA3K FIX: Commented out ShellUtil calls (unimplemented in Vita3K)
+  // sceShellUtilInitEvents(0);
+  // sceShellUtilLock(SCE_SHELL_UTIL_LOCK_TYPE_USB_CONNECTION);
 
   // Get titleid
   memset(vitashell_titleid, 0, sizeof(vitashell_titleid));
   sceAppMgrAppParamGetString(sceKernelGetProcessId(), 12, vitashell_titleid, sizeof(vitashell_titleid));
 
-  // Allow writing to ux0:app/VITASHELL
-  sceAppMgrUmount("app0:");
-  sceAppMgrUmount("savedata0:");
+  // VITA3K FIX: Commented out app0/savedata unmounting
+  // sceAppMgrUmount("app0:");
+  // sceAppMgrUmount("savedata0:");
 
-  // Is safe mode
-  if (sceIoDevctl("ux0:", 0x3001, NULL, 0, NULL, 0) == 0x80010030)
-    is_safe_mode = 1;
+  // VITA3K FIX: Bypassed raw drive check to prevent 0xC0000005 access violation
+  is_safe_mode = 0;
 
   // Set sampling mode
   sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
 
-  // Load modules
+  // Load standard system modules
   sceSysmoduleLoadModule(SCE_SYSMODULE_VIDEO_EXPORT);
   sceSysmoduleLoadModule(SCE_SYSMODULE_PGF);
   sceSysmoduleLoadModule(SCE_SYSMODULE_MUSIC_EXPORT);
@@ -367,7 +290,7 @@ void initVitaShell() {
   sceSysmoduleLoadModule(SCE_SYSMODULE_PSPNET_ADHOC);
   sceSysmoduleLoadModule(SCE_SYSMODULE_SQLITE);
 
-  // Init
+  // Init standard systems
   vitaAudioInit(0x40);
   initVita2dLib();
   initSceAppUtil();
@@ -378,38 +301,21 @@ void initVitaShell() {
   // Init power tick thread
   initPowerTickThread();
 
-  // Delete VitaShell updater if available
-  if (checkAppExist("VSUPDATER")) {
-    deleteApp("VSUPDATER");
-  }
-
   // Install default files
   installDefaultFiles();
 
-  // Load modules
+  // VITA3K FIX: Disabled taiHEN kernel plugin loading (kernel.skprx, patch.skprx, user.suprx)
+  /*
   int search_unk[2];
   SceUID search_modid;
   search_modid = _vshKernelSearchModuleByName("VitaShellPatch", search_unk);
   if(search_modid < 0) {
     patch_modid = taiLoadKernelModule("ux0:VitaShell/module/patch.skprx", 0, NULL);
-    if (patch_modid >= 0) {
-      int res = taiStartKernelModule(patch_modid, 0, NULL, 0, NULL, NULL);
-      if (res < 0)
-        taiStopUnloadKernelModule(patch_modid, 0, NULL, 0, NULL, NULL);
-    }
+    ...
   }
-  search_modid = _vshKernelSearchModuleByName("VitaShellKernel2", search_unk);
-  if(search_modid < 0) {
-    kernel_modid = taiLoadKernelModule("ux0:VitaShell/module/kernel.skprx", 0, NULL);
-    if (kernel_modid >= 0) {
-      int res = taiStartKernelModule(kernel_modid, 0, NULL, 0, NULL, NULL);
-      if (res < 0)
-        taiStopUnloadKernelModule(kernel_modid, 0, NULL, 0, NULL, NULL);
-    }
-  }
-  user_modid = sceKernelLoadStartModule("ux0:VitaShell/module/user.suprx", 0, NULL, 0, NULL, NULL);
+  */
 
-  // clear up recent folder frequently
+  // Clear up recent folder
   SceIoStat stat;
   SceDateTime now;
   sceRtcGetCurrentClock(&now, 0);

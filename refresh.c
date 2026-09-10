@@ -235,7 +235,7 @@ int refreshNeeded(const char *app_path, const char* content_type) {
         int read_sz = ReadFile(sce_ebootpbp, eboot_signature, 0x200);
         
 		long unk0;
-		int verify = _vshNpDrmEbootSigVerify(ebootpbp_path, eboot_signature, &unk0);
+		int verify = _vshNpDrmEbootSigVerify(ebootpbp_path, eboot_signature, (char **)&unk0);
 		
         if(verify < 0) // if signature is invalid, then needs refresh
           return 1;

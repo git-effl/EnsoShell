@@ -105,30 +105,10 @@ void drawShellInfo(const char *path) {
   // Status bar
   float x = SCREEN_WIDTH - SHELL_MARGIN_X;
 
-  // Battery
-  if (sceKernelGetModel() == SCE_KERNEL_MODEL_VITA) {
-    float battery_x = ALIGN_RIGHT(x, vita2d_texture_get_width(battery_image));
-    vita2d_draw_texture(battery_image, battery_x, SHELL_MARGIN_Y + 3.0f);
-
-    vita2d_texture *battery_bar_image = battery_bar_green_image;
-
-    if (scePowerIsLowBattery() && !scePowerIsBatteryCharging()) {
-      battery_bar_image = battery_bar_red_image;
-    } 
-
-    float percent = scePowerGetBatteryLifePercent() / 100.0f;
-
-    float width = vita2d_texture_get_width(battery_bar_image);
-    vita2d_draw_texture_part(battery_bar_image, battery_x + 3.0f + (1.0f - percent) * width,
-                             SHELL_MARGIN_Y + 5.0f, (1.0f - percent) * width, 0.0f, percent * width,
-                             vita2d_texture_get_height(battery_bar_image));
-
-    if (scePowerIsBatteryCharging()) {
-      vita2d_draw_texture(battery_bar_charge_image, battery_x + 3.0f, SHELL_MARGIN_Y + 5.0f);
-    }
-
-    x = battery_x - STATUS_BAR_SPACE_X;
-  }
+  /*
+   * VITA3K FIX: Bypassed scePower battery functions as low-level 
+   * hardware power checks cause crashes in the emulator environment.
+   */
 
   // Date & time
   SceDateTime time;
@@ -155,7 +135,6 @@ void drawShellInfo(const char *path) {
     x = ftp_x - STATUS_BAR_SPACE_X;
   }
 
-  // TODO: make this more elegant
   // Path
   int line_width = 0;
 
@@ -206,47 +185,12 @@ void initFtp() {
 }
 
 void initUsb() {
-  char *path = NULL;
-
-  if (vitashell_config.usbdevice == USBDEVICE_MODE_MEMORY_CARD) {
-    if (checkFileExist("sdstor0:xmc-lp-ign-userext"))
-      path = "sdstor0:xmc-lp-ign-userext";
-    else if (checkFileExist("sdstor0:int-lp-ign-userext"))
-      path = "sdstor0:int-lp-ign-userext";
-    else
-      infoDialog(language_container[MEMORY_CARD_NOT_FOUND]);
-  } else if (vitashell_config.usbdevice == USBDEVICE_MODE_GAME_CARD) {
-    if (checkFileExist("sdstor0:gcd-lp-ign-gamero"))
-      path = "sdstor0:gcd-lp-ign-gamero";
-    else
-      infoDialog(language_container[GAME_CARD_NOT_FOUND]);
-  } else if (vitashell_config.usbdevice == USBDEVICE_MODE_SD2VITA) {
-    if (checkFileExist("sdstor0:gcd-lp-ign-entire"))
-      path = "sdstor0:gcd-lp-ign-entire";
-    else
-      infoDialog(language_container[MICROSD_NOT_FOUND]);
-  } else if (vitashell_config.usbdevice == USBDEVICE_MODE_PSVSD) {
-    if (checkFileExist("sdstor0:uma-pp-act-a"))
-      path = "sdstor0:uma-pp-act-a";
-    else if (checkFileExist("sdstor0:uma-lp-act-entire"))
-      path = "sdstor0:uma-lp-act-entire";
-    else
-      infoDialog(language_container[MICROSD_NOT_FOUND]);
-  }
-
-  if (!path)
-    return;
-
-  usbdevice_modid = startUsb("ux0:VitaShell/module/usbdevice.skprx", path, SCE_USBSTOR_VSTOR_TYPE_FAT);
-  if (usbdevice_modid >= 0) {
-    // Lock power timers
-    powerLock();
-    
-    initMessageDialog(SCE_MSG_DIALOG_BUTTON_TYPE_CANCEL, language_container[USB_CONNECTED]);
-    setDialogStep(DIALOG_STEP_USB);
-  } else {
-    errorDialog(usbdevice_modid);
-  }
+  /*
+   * VITA3K FIX: Bypassed sdstor0 raw partition access and usbdevice.skprx kernel plugin loading.
+   * Vita3K does not support raw hardware block mounting.
+   */
+  infoDialog("USB Mass Storage mounting is not supported on Vita3K.");
+  return;
 }
 
 int dialogSteps() {
@@ -393,26 +337,8 @@ int dialogSteps() {
 
     case DIALOG_STEP_USB_ATTACH_WAIT:
     {
-      if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        if (checkFileExist("sdstor0:uma-lp-act-entire")) {
-          sceMsgDialogClose();
-        }
-      } else {
-        if (msg_result == MESSAGE_DIALOG_RESULT_NONE ||
-            msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-          setDialogStep(DIALOG_STEP_NONE);
-          
-          if (checkFileExist("sdstor0:uma-lp-act-entire")) {
-            int res = vshIoMount(0xF00, NULL, 0, 0, 0, 0);
-            if (res < 0)
-              errorDialog(res);
-            else
-              infoDialog(language_container[UMA0_MOUNTED]);
-            refresh = REFRESH_MODE_NORMAL;
-          }
-        }
-      }
-      
+      infoDialog("USB attachment is not supported on Vita3K.");
+      setDialogStep(DIALOG_STEP_NONE);
       break;
     }
     
@@ -462,47 +388,10 @@ int dialogSteps() {
     }
     
     case DIALOG_STEP_USB_WAIT:
-    {
-      if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        SceUdcdDeviceState state;
-        sceUdcdGetDeviceState(&state);
-        
-        if (state.cable & SCE_UDCD_STATUS_CABLE_CONNECTED) {
-          sceMsgDialogClose();
-        }
-      } else {
-        if (msg_result == MESSAGE_DIALOG_RESULT_NONE ||
-            msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-          setDialogStep(DIALOG_STEP_NONE);
-
-          SceUdcdDeviceState state;
-          sceUdcdGetDeviceState(&state);
-          
-          if (state.cable & SCE_UDCD_STATUS_CABLE_CONNECTED) {
-            initUsb();
-          }
-        }
-      }
-      
-      break;
-    }
-    
     case DIALOG_STEP_USB:
     {
-      if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        SceUdcdDeviceState state;
-        sceUdcdGetDeviceState(&state);
-        
-        if (state.cable & SCE_UDCD_STATUS_CABLE_DISCONNECTED) {
-          sceMsgDialogClose();
-        }
-      } else if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-        powerUnlock();
-        stopUsb(usbdevice_modid);
-        refresh = REFRESH_MODE_NORMAL;
-        setDialogStep(DIALOG_STEP_NONE);
-      }
-
+      infoDialog("USB Mode is not supported on Vita3K.");
+      setDialogStep(DIALOG_STEP_NONE);
       break;
     }
     
@@ -743,11 +632,9 @@ int dialogSteps() {
     case DIALOG_STEP_HASH_QUESTION:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_YES) {
-        // Throw up the progress bar, enter hashing state
         initMessageDialog(MESSAGE_DIALOG_PROGRESS_BAR, language_container[HASHING]);
         setDialogStep(DIALOG_STEP_HASH_CONFIRMED);
       } else if (msg_result == MESSAGE_DIALOG_RESULT_NO) {
-        // Quit
         setDialogStep(DIALOG_STEP_NONE);
       }
 
@@ -757,14 +644,12 @@ int dialogSteps() {
     case DIALOG_STEP_HASH_CONFIRMED:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        // User has confirmed desire to hash, get requested file entry
         FileListEntry *file_entry = fileListGetNthEntry(&file_list, base_pos + rel_pos);
         if (!file_entry) {
           setDialogStep(DIALOG_STEP_NONE);
           break;
         }
         
-        // Place the full file path in cur_file
         snprintf(cur_file, MAX_PATH_LENGTH, "%s%s", file_list.path, file_entry->name);
 
         HashArguments args;
@@ -772,7 +657,6 @@ int dialogSteps() {
 
         setDialogStep(DIALOG_STEP_HASHING);
 
-        // Create a thread to run out actual sum
         SceUID thid = sceKernelCreateThread("hash_thread", (SceKernelThreadEntry)hash_thread, 0x40, 0x100000, 0, 0, NULL);
         if (thid >= 0)
           sceKernelStartThread(thid, sizeof(HashArguments), &args);
@@ -803,10 +687,7 @@ int dialogSteps() {
           snprintf(install_path, MAX_PATH_LENGTH, "%s%s", install_list.path, entry->name);
           args.file = install_path;
 
-          // Focus
           setFocusOnFilename(entry->name);
-
-          // Remove entry
           fileListRemoveEntry(&install_list, entry);
         } else {
           args.file = cur_file;
@@ -925,7 +806,7 @@ int dialogSteps() {
     
     case DIALOG_STEP_EXTRACTED:
     {
-			removePath("ux0:patch/VITASHELL", NULL);
+      removePath("ux0:patch/VITASHELL", NULL);
       launchAppByUriExit("VSUPDATER");
       setDialogStep(DIALOG_STEP_NONE);
       break;
@@ -1026,7 +907,6 @@ int dialogSteps() {
         if (password[0] == '\0') {
           setDialogStep(DIALOG_STEP_NONE);
         } else {
-          // TODO: verify password
           archiveSetPassword(password);
           
           FileListEntry *file_entry = fileListGetNthEntry(&file_list, base_pos + rel_pos);
@@ -1070,7 +950,6 @@ int dialogSteps() {
     case DIALOG_STEP_ADHOC_SEND_WAITING:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        // Wait for a response, then close
         if (strcmp(adhocReceiveClientReponse(), "YES") == 0 ||
             strcmp(adhocReceiveClientReponse(), "NO") == 0) {
           sceMsgDialogClose();
@@ -1092,7 +971,6 @@ int dialogSteps() {
           initMessageDialog(SCE_MSG_DIALOG_BUTTON_TYPE_CANCEL, language_container[ADHOC_CLIENT_DECLINED]);
           setDialogStep(DIALOG_STEP_ADHOC_SEND_CLIENT_DECLINED);
         } else {
-          // Return to select menu
           adhocCloseSockets();
           initAdhocDialog();
           setDialogStep(DIALOG_STEP_NONE);
@@ -1105,7 +983,6 @@ int dialogSteps() {
     case DIALOG_STEP_ADHOC_SEND_CLIENT_DECLINED:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-        // Return to select menu
         adhocCloseSockets();
         initAdhocDialog();
         setDialogStep(DIALOG_STEP_NONE);
@@ -1130,12 +1007,10 @@ int dialogSteps() {
     case DIALOG_STEP_ADHOC_RECEIVE_SEARCHING:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_RUNNING) {
-        // Wait for a request, then close
         if (adhocReceiveServerRequest() == 1) {
           sceMsgDialogClose();
         }
       } else if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-        // If the dialog is closed and we got a request, go to question state, otherwise end waiting
         if (adhocReceiveServerRequest() == 1) {
           initMessageDialog(SCE_MSG_DIALOG_BUTTON_TYPE_YESNO, language_container[ADHOC_RECEIVE_QUESTION], adhocGetServerNickname());
           setDialogStep(DIALOG_STEP_ADHOC_RECEIVE_QUESTION);
@@ -1171,9 +1046,8 @@ int dialogSteps() {
             sceKernelStartThread(thid, sizeof(ReceiveArguments), &args);
         }
       } else if (msg_result == MESSAGE_DIALOG_RESULT_NO) {
-        adhocSendServerResponse("NO"); // Do not check result
+        adhocSendServerResponse("NO");
         
-        // Go back to searching
         adhocCloseSockets();
         adhocWaitingForServerRequest();
         initMessageDialog(SCE_MSG_DIALOG_BUTTON_TYPE_CANCEL, language_container[ADHOC_RECEIVE_SEARCHING_PSVITA]);
@@ -1184,15 +1058,6 @@ int dialogSteps() {
     }
     
     case DIALOG_STEP_ADHOC_SENDED:
-    {
-      if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-        refresh = REFRESH_MODE_NORMAL;
-        setDialogStep(DIALOG_STEP_NONE);
-      }
-      
-      break;
-    }
-    
     case DIALOG_STEP_ADHOC_RECEIVED:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
@@ -1207,7 +1072,6 @@ int dialogSteps() {
     case DIALOG_STEP_ADHOC_RECEIVING:
     {
       if (msg_result == MESSAGE_DIALOG_RESULT_FINISHED) {
-        // Alert sockets
         adhocAlertSockets();
       }
       
@@ -1247,16 +1111,12 @@ int main(int argc, const char *argv[]) {
   loadTheme();
   loadLanguage(language);
 
+
+  vitashell_config.disable_autoupdate = 1;
+
   // Init context menu width
   initContextMenuWidth();
   initTextContextMenuWidth();
-  
-  // Automatic network update
-  if (!vitashell_config.disable_autoupdate) {
-    SceUID thid = sceKernelCreateThread("network_update_thread", network_update_thread, 0x10000100, 0x100000, 0, 0, NULL);
-    if (thid >= 0)
-      sceKernelStartThread(thid, 0, NULL);
-  }
 
   // File browser
   browserMain();
