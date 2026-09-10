@@ -214,7 +214,7 @@ target_link_libraries(VitaShell
 
 # Create Vita artifacts
 vita_create_self(eboot.bin VitaShell UNSAFE)
-vita_create_vpk(VitaShell.vpk ${VITA_TITLEID} eboot.bin
+vita_create_vpk(EnsoShell.vpk ${VITA_TITLEID} eboot.bin
   VERSION ${VITA_VERSION}
   NAME ${VITA_APP_NAME}
   FILE pkg/sce_sys/icon0.png sce_sys/icon0.png
@@ -226,12 +226,12 @@ vita_create_vpk(VitaShell.vpk ${VITA_TITLEID} eboot.bin
 # for network update
 add_custom_target(release
   COMMAND cp eboot.bin ../release/eboot.bin
-  COMMAND cp VitaShell.vpk_param.sfo ../release/param.sfo
-  COMMAND cp VitaShell.vpk ../release/VitaShell.vpk
+  COMMAND cp EnsoShell.vpk_param.sfo ../release/param.sfo
+  COMMAND cp EnsoShell.vpk ../release/EnsoShell.vpk
   COMMAND cp ../pkg/sce_sys/livearea/contents/template.xml ../release/template.xml
   DEPENDS eboot.bin
-  DEPENDS VitaShell.vpk
-  DEPENDS VitaShell.vpk_param.sfo
+  DEPENDS EnsoShell.vpk
+  DEPENDS EnsoShell.vpk_param.sfo
 )
 
 add_custom_target(send
