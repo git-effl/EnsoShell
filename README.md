@@ -100,5 +100,5 @@ mkdir build && cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=${VITASDK}/share/vita
 * wololo for the Revitalize contest
 * sakya for Lightmp3
 * Everybody who contributed on vitasdk
-* [ethan](https://www.flickr.com/photos/30151597@N03) for the [ensō image](https://www.flickr.com/photos/30151597@N03/2823325892/),licensed under [CC-BY-SA 2.0](https://github.com/git-effl/EnsoShell/blob/main/ENSO.TXT)
+* [ethan](https://www.flickr.com/photos/30151597@N03) for the [ensō image](https://www.flickr.com/photos/30151597@N03/2823325892/),used for the livearea images,licensed under [CC-BY-SA 2.0](https://github.com/git-effl/EnsoShell/blob/main/ENSO.TXT)
 * The [Noto Project Authors](https://github.com/notofonts) for the [Noto Sans font](https://github.com/notofonts/latin-greek-cyrillic),licensed under [SIL OFL 1.1](https://github.com/git-effl/EnsoShell/blob/main/NOTOSANS.TXT)
