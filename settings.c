@@ -47,10 +47,10 @@ static int theme_count = 0;
 static char *theme_name = NULL;
 
 static ConfigEntry settings_entries[] = {
-  { "USBDEVICE",          CONFIG_TYPE_DECIMAL, (int *)&EnsoShell_config.usbdevice },
-  { "SELECT_BUTTON",      CONFIG_TYPE_DECIMAL, (int *)&EnsoShell_config.select_button },
-  { "DISABLE_AUTOUPDATE", CONFIG_TYPE_BOOLEAN, (int *)&EnsoShell_config.disable_autoupdate },
-  { "DISABLE_WARNING",    CONFIG_TYPE_BOOLEAN, (int *)&EnsoShell_config.disable_warning },
+  { "USBDEVICE",         CONFIG_TYPE_DECIMAL, (int *)&vitashell_config.usbdevice },
+  { "SELECT_BUTTON",     CONFIG_TYPE_DECIMAL, (int *)&vitashell_config.select_button },
+  { "DISABLE_AUTOUPDATE", CONFIG_TYPE_BOOLEAN, (int *)&vitashell_config.disable_autoupdate },
+  { "DISABLE_WARNING",    CONFIG_TYPE_BOOLEAN, (int *)&vitashell_config.disable_warning },
 };
 
 static ConfigEntry theme_entries[] = {
@@ -58,35 +58,34 @@ static ConfigEntry theme_entries[] = {
 };
 
 SettingsMenuOption main_settings[] = {
-  // { EnsoShell_SETTINGS_LANGUAGE,      SETTINGS_OPTION_TYPE_BOOLEAN, NULL, NULL, 0, NULL, 0, &language },
-  { EnsoShell_SETTINGS_THEME,           SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0, NULL, 0, NULL },
+  { VITASHELL_SETTINGS_THEME,           SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0, NULL, 0, NULL },
   
-  { EnsoShell_SETTINGS_USBDEVICE,       SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0,
-    usbdevice_options, sizeof(usbdevice_options) / sizeof(char **), &EnsoShell_config.usbdevice },
-  { EnsoShell_SETTINGS_SELECT_BUTTON,   SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0,
-    select_button_options, sizeof(select_button_options) / sizeof(char **), &EnsoShell_config.select_button },
-  { EnsoShell_SETTINGS_NO_AUTO_UPDATE,  SETTINGS_OPTION_TYPE_BOOLEAN, NULL, NULL, 0, NULL, 0, &EnsoShell_config.disable_autoupdate },
-  { EnsoShell_SETTINGS_WARNING_MESSAGE, SETTINGS_OPTION_TYPE_BOOLEAN, NULL, NULL, 0, NULL, 0, &EnsoShell_config.disable_warning },
+  { VITASHELL_SETTINGS_USBDEVICE,       SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0,
+    usbdevice_options, sizeof(usbdevice_options) / sizeof(char **), &vitashell_config.usbdevice },
+  { VITASHELL_SETTINGS_SELECT_BUTTON,   SETTINGS_OPTION_TYPE_OPTIONS, NULL, NULL, 0,
+    select_button_options, sizeof(select_button_options) / sizeof(char **), &vitashell_config.select_button },
+  { VITASHELL_SETTINGS_NO_AUTO_UPDATE,  SETTINGS_OPTION_TYPE_BOOLEAN, NULL, NULL, 0, NULL, 0, &vitashell_config.disable_autoupdate },
+  { VITASHELL_SETTINGS_WARNING_MESSAGE, SETTINGS_OPTION_TYPE_BOOLEAN, NULL, NULL, 0, NULL, 0, &vitashell_config.disable_warning },
 
-  { EnsoShell_SETTINGS_RESTART_SHELL,   SETTINGS_OPTION_TYPE_CALLBACK, (void *)restartShell, NULL, 0, NULL, 0, NULL },
+  { VITASHELL_SETTINGS_RESTART_SHELL,   SETTINGS_OPTION_TYPE_CALLBACK, (void *)restartShell, NULL, 0, NULL, 0, NULL },
 };
 
 SettingsMenuOption power_settings[] = {
-  { EnsoShell_SETTINGS_REBOOT,    SETTINGS_OPTION_TYPE_CALLBACK, (void *)rebootDevice, NULL, 0, NULL, 0, NULL },
-  { EnsoShell_SETTINGS_POWEROFF,  SETTINGS_OPTION_TYPE_CALLBACK, (void *)shutdownDevice, NULL, 0, NULL, 0, NULL },
-  { EnsoShell_SETTINGS_STANDBY,   SETTINGS_OPTION_TYPE_CALLBACK, (void *)suspendDevice, NULL, 0, NULL, 0, NULL },
+  { VITASHELL_SETTINGS_REBOOT,    SETTINGS_OPTION_TYPE_CALLBACK, (void *)rebootDevice, NULL, 0, NULL, 0, NULL },
+  { VITASHELL_SETTINGS_POWEROFF,  SETTINGS_OPTION_TYPE_CALLBACK, (void *)shutdownDevice, NULL, 0, NULL, 0, NULL },
+  { VITASHELL_SETTINGS_STANDBY,   SETTINGS_OPTION_TYPE_CALLBACK, (void *)suspendDevice, NULL, 0, NULL, 0, NULL },
 };
 
-SettingsMenuEntry EnsoShell_settings_menu_entries[] = {
-  { EnsoShell_SETTINGS_MAIN,  main_settings,  sizeof(main_settings) / sizeof(SettingsMenuOption) },
-  { EnsoShell_SETTINGS_POWER, power_settings, sizeof(power_settings) / sizeof(SettingsMenuOption) },
+SettingsMenuEntry vitashell_settings_menu_entries[] = {
+  { VITASHELL_SETTINGS_MAIN,  main_settings,  sizeof(main_settings) / sizeof(SettingsMenuOption) },
+  { VITASHELL_SETTINGS_POWER, power_settings, sizeof(power_settings) / sizeof(SettingsMenuOption) },
 };
 
 static SettingsMenu settings_menu;
 
 void loadSettingsConfig() {
   // Load settings config file
-  memset(&EnsoShell_config, 0, sizeof(EnsoShellConfig));
+  memset(&vitashell_config, 0, sizeof(VitaShellConfig));
   readConfig("ux0:EnsoShell/settings.txt", settings_entries, sizeof(settings_entries) / sizeof(ConfigEntry));
 }
 
@@ -95,7 +94,7 @@ void saveSettingsConfig() {
   writeConfig("ux0:EnsoShell/settings.txt", settings_entries, sizeof(settings_entries) / sizeof(ConfigEntry));
 
   if (sceKernelGetModel() == SCE_KERNEL_MODEL_VITATV) {
-    EnsoShell_config.select_button = SELECT_BUTTON_MODE_FTP;
+    vitashell_config.select_button = SELECT_BUTTON_MODE_FTP;
   }
 }
 
@@ -125,19 +124,19 @@ void initSettingsMenu() {
   memset(&settings_menu, 0, sizeof(SettingsMenu));
   settings_menu.status = SETTINGS_MENU_CLOSED;
 
-  n_settings_entries = sizeof(EnsoShell_settings_menu_entries) / sizeof(SettingsMenuEntry);
-  settings_menu_entries = EnsoShell_settings_menu_entries;
+  n_settings_entries = sizeof(vitashell_settings_menu_entries) / sizeof(SettingsMenuEntry);
+  settings_menu_entries = vitashell_settings_menu_entries;
 
   for (i = 0; i < n_settings_entries; i++)
     settings_menu.n_options += settings_menu_entries[i].n_options;
 
-  usbdevice_options[0] = language_container[EnsoShell_SETTINGS_USB_MEMORY_CARD];
-  usbdevice_options[1] = language_container[EnsoShell_SETTINGS_USB_GAME_CARD];
-  usbdevice_options[2] = language_container[EnsoShell_SETTINGS_USB_SD2VITA];
-  usbdevice_options[3] = language_container[EnsoShell_SETTINGS_USB_PSVSD];
+  usbdevice_options[0] = language_container[VITASHELL_SETTINGS_USB_MEMORY_CARD];
+  usbdevice_options[1] = language_container[VITASHELL_SETTINGS_USB_GAME_CARD];
+  usbdevice_options[2] = language_container[VITASHELL_SETTINGS_USB_SD2VITA];
+  usbdevice_options[3] = language_container[VITASHELL_SETTINGS_USB_PSVSD];
 
-  select_button_options[0] = language_container[EnsoShell_SETTINGS_SELECT_BUTTON_USB];
-  select_button_options[1] = language_container[EnsoShell_SETTINGS_SELECT_BUTTON_FTP];
+  select_button_options[0] = language_container[VITASHELL_SETTINGS_SELECT_BUTTON_USB];
+  select_button_options[1] = language_container[VITASHELL_SETTINGS_SELECT_BUTTON_FTP];
   
   theme_options = malloc(MAX_THEMES * sizeof(char *));
   
@@ -161,7 +160,7 @@ void openSettingsMenu() {
 
   int i;
   for (i = 0; i < (sizeof(main_settings) / sizeof(SettingsMenuOption)); i++) {
-    if (main_settings[i].name == EnsoShell_SETTINGS_THEME) {
+    if (main_settings[i].name == VITASHELL_SETTINGS_THEME) {
       theme_index = i;
       break;
     }
